@@ -10,6 +10,8 @@ library(devtools)
 library(tidyverse)
 library(sf)
 library(terradactyl)
+library(rgdal)
+library(raster)
 
 
 # Point to the source geodatabase 
@@ -88,6 +90,44 @@ ecoregion <- "20"
 # Subset plots to ecoregion
 er.plots <- dplyr::filter(study.plots, US_L3CODE == paste(ecoregion))
 er.header <- subset(header, header$PrimaryKey %in% er.plots$PrimaryKey)
+
+
+# Read sdat in from asc file
+library(raster)
+r <- raster::raster("C:\\Users\\aheller\\Documents\\Benchmarks\\Spatial\\sdat.asc")
+# Reproject to match study.plots
+raster::crs(r) <- crs("EPSG:5070")
+r <- raster::projectRaster(r, crs = crs(study.plots))
+# Set -9999 to NA (described in sdat metadata)
+r[r == -9999] <- NA
+# Look at histogram of raster values
+hist(r)
+
+
+# Extract sdat values to points
+study.plots.sdat <- extract(r, study.plots)
+
+
+population_26 <- extract(raster26,
+                         PM25_p26,
+                         buffer=500, # 500m radius
+                         fun=mean,na.rm=T,
+                         sp = TRUE,
+                         method='simple')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
