@@ -12,6 +12,7 @@ library(sf)
 library(terradactyl)
 library(rgdal)
 library(raster)
+library(prism)
 
 
 # Point to the source geodatabase 
@@ -61,6 +62,7 @@ plot(study.area, col = alpha("gray", 0.5), lwd = 1.5, add = TRUE)
 # Count plots within ecoregions
 table(tdat.study.plots$US_L3CODE)
 table(lmf.study.plots$US_L3CODE)
+table(study.plots$US_L3CODE)
 
 
 
@@ -90,6 +92,22 @@ ecoregion <- "20"
 # Subset plots to ecoregion
 er.plots <- dplyr::filter(study.plots, US_L3CODE == paste(ecoregion))
 er.header <- subset(header, header$PrimaryKey %in% er.plots$PrimaryKey)
+
+
+# Read in prism data
+# Set download folder
+prism_set_dl_dir("~/prismtmp")
+# Download 30 year normal data
+prism::get_prism_normals(type = "tmean", resolution = "800m", annual = TRUE, keepZip = FALSE)
+# View downloads
+prism_archive_ls()
+
+
+
+
+
+
+
 
 
 # Read sdat in from asc file
